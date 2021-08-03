@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>簡易計算機</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
+    />
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      .btn:active{
+        background-color: rgb(58, 44, 255);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app" class="h-100 d-flex align-items-center">
+      <div
+        class="container"
+      >
+      <div class="row justify-content-center">
+        <div class="col-6">
+          <div class="row">
+            <div class="col-md-6">
+              <label for="exampleFormControlInput1" class="form-label"
+                >第一個數字</label
+              >
+              <input
+                id="num1"
+                type="number"
+                class="form-control"
+                placeholder="請輸入要計算的第一個數字"
+                v-model.number= "num1"
+                @change="check"
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="num2" class="form-label">第二個數字</label>
+              <input
+                id="num2"
+                type="number"
+                class="form-control"
+                placeholder="請輸入要計算的第二個數字"
+                v-model.number= "num2"
+                @change="check"
+              />
+            </div>
+            <div class="col-md-12 mt-3">
+              <div class="btn-group w-100">
+                <button
+                  type="button"
+                  class="btn btn-outline-primary w-25"
+                  :class="{isActive: operator === '+'}"
+                  @click.prevent="operator = '+'"
+                >
+                  +
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary w-25"
+                  :class="{isActive: operator === '-'}"
+                  @click.prevent="operator = '-'"
+                >
+                  -
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary w-25"
+                  :class="{isActive: operator === '*'}"
+                  @click.prevent="operator = '*'"
+                >
+                  *
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary w-25"
+                  :class="{isActive: operator === '/'}"
+                  @click.prevent="operator = '/'"
+                >
+                  /
+                </button>
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="btn btn-outline-primary d-block mt-3 w-100"
+            @click.prevent = "cal"
+          >
+            計算結果
+          </button>
+          <h4 class="mt-3">結果：{{ resultNum }}</h4>
+        </div>
+        <div class="col-3">
+          <h5>歷史紀錄</h5>
+          <ul>
+            <li v-for= "(item, index) in lists" :key="index">
+              第{{ index+1 }} 筆: {{ item }}
+            </li>
+          </ul>
+        </div>
+      </div>
+      </div>
+    </div>
+    <script src="https://unpkg.com/vue@next"></script>
+    <script>
+      Vue.createApp({
+        data: function() {
+          return{
+            num1: 0,
+            num2: 0,
+            operator: '',
+            resultNum: 0,
+            lists:[],
+            flag: false,
+          }
+        },
+        methods:{
+          
+          cal: function(){
+            if(this.flag === true){
+              switch(this.operator){
+                case '+':
+                  this.num1 = this.resultNum;
+                  this.resultNum  += this.num2;
+                  this.flag= true;
+                  break;
+                case '-':
+                  this.num1 = this.resultNum;
+                  this.resultNum -= this.num2;
+                  this.flag= true;
+                  break;
+                case '*':
+                  this.num1 = this.resultNum;
+                  this.resultNum *= this.num2;
+                  this.flag= true;
+                  break;
+                case '/':
+                  this.num1 = this.resultNum;
+                  this.resultNum /= this.num2;
+                  this.flag= true;
+                  break;
+              }
+            }else{
+              switch(this.operator){
+                case '+':
+                  this.resultNum = this.num1 + this.num2;
+                  this.flag= true;
+                  break;
+                case '-':
+                  this.resultNum = this.num1 - this.num2;
+                  this.flag= true;
+                  break;
+                case '*':
+                  this.resultNum = this.num1 * this.num2;
+                  this.flag= true;
+                  break;
+                case '/':
+                  this.resultNum = this.num1 / this.num2;
+                  this.flag= true;
+                  break;
+              }
+            }
+            
+            var input = this.num1 + this.operator + this.num2 + '=' + this.resultNum;
+            localStorage.setItem('data', JSON.stringify(input));
+            this.lists.push(input);
+            if(this.lists.length > 10){
+              this.lists.splice(0,1);
+            }
+           
+          },
+          check: function(){
+            this.flag = false;
+          }
+          
+        },
+
+        mounted(){
+
+        },
+        computed(){
+          
+            
+        }
+        
+      }).mount('#app');
+    </script>
+  </body>
+</html>
