@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>代辦事項</title>
+
+  <!-- bootstrap5 css -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous" />
+  <!-- font-awesome css -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
+
+  <!-- self css -->
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+  <div id="app" class="container my-3">
+    <!-- add toDoList -->
+    <div class="row justify-content-center">
+      <div class="col-8">
+        <div class="input-group mb-3">
+          <span class="input-group-text">待辦事項</span>
+          <input type="text" class="form-control" placeholder="準備要做的任務" id="newTodo" v-model="newTodo" />
+          <button class="btn btn-primary" type="button" id="addTodo" @click="add_list">
+            新增
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- status -->
+    <div class="text-center">
+      <div class="header">
+        <ul class="nav nav-pills justify-content-center mt-3">
+          <li class="nav-item">
+            <a class="nav-link me-3" :class="status =='all' ? 'active' : ''" href="#"
+              @click.prevent="status = 'all'">全部</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link me-3" href="#" :class="status == 'unfinished' ? 'active' : ''"
+              @click.prevent="status = 'unfinished'">未完成</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link me-3" href="#" :class="status == 'finished' ? 'active' : ''"
+              @click.prevent="status = 'finished'">已完成</a>
+          </li>
+        </ul>
+        
+        <hr>
+
+        
+
+      </div>
+      <div class="m-2 d-block">
+        <span class="nav justify-content-begin">
+          有<span id="taskCount">{{ todoList.length }}</span>筆任務
+        </span>
+
+        <div class="nav justify-content-end">
+          <button v-if="todoList.length >0 " class="btn btn-danger me-3" href="#" @click.prevent="clear">清除所有任務</button>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+
+      <!-- content -->
+      <div class="card">
+        <ul class="list-group list-group-flush text-left" id="todoList">
+          <li class="list-group-item" v-if="todoList.length == 0">
+            目前沒有代辦事項
+          </li>
+          <li class="list-group-item" v-for="item in filterData" :key="item.id">
+            <div class="d-flex">
+              <div class="form-check">
+                <!-- if 要編輯 -->
+                <input v-if="tmpId === item.id" v-model="tmpTitle" type="text" class="form-control"
+                  @keyup.enter="finshedit(item)" @keyup.esc="canceledit" />
+                <!-- 正常顯示 -->
+                <div v-else>
+                  <input :id="item.id" type="checkbox" class="form-check-input"
+                    @click="item.itm_status = !item.itm_status" :checked="item.itm_status" />
+  
+                  <label @dblclick="editItem(item.id, item.title)" :for="item.id"
+                    :class="item.itm_status ? 'completed' : ''" class="form-check-label">{{ item.title }}</label>
+                </div>
+              </div>
+              <div class="ms-auto">
+                <label :for="item.date" class="form-check-label">
+                  {{ item.time }}
+                </label>
+              </div>
+              <div class="clearfix"></div>
+              <button type="button" class="btn-close ms-auto remove" @click="remove_item(item.id)"></button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      
+
+    
+  </div>
+
+  <!-- bootstrap5 cdn -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8"
+    crossorigin="anonymous"></script>
+  <!-- vue3 cdn -->
+  <script src="https://unpkg.com/vue@next"></script>
+
+  <script>
+    
+    
+    Vue.createApp({
+      data() {
+        return {
+          newTodo: "",
+          todoList: [],
+          tmpTitle: "",
+          tmpId: "",
+          status: "all",
+          editStatus: false,
+        };
+      },
+      methods: {
+        //新增
+        add_list: function () {
+          const content = this.newTodo && this.newTodo.trim();
+          
+          var createTime = this.getTime();
+          console.log(createTime);
+          if(!content){
+            //空白不給輸入
+            return;
+          }
+          this.todoList.push({
+            id: this.todoList.length + 1,
+            title: this.newTodo,
+            itm_status: false,
+            time: createTime,
+          });
+          localStorage.setItem('todoList', JSON.stringify(this.todoList));
+          this.newTodo = "";
+        },
+        //移除代辦事項
+        remove_item: function (id) {
+          var ind = this.todoList.findIndex((obj) => obj.id === id);
+          this.todoList.splice(ind, 1);
+          localStorage.removeItem(ind);
+        },
+        //編輯代辦事項
+        editItem: function (id, title) {
+          this.tmpId = id;
+          this.tmpTitle = title;
+        },
+        //刪除所有代辦事項
+        clear: function () {
+          if (window.confirm("刪除所有代辦事項?")) {
+            while (this.todoList.length > 0) {
+              this.todoList.pop();
+            }
+            localStorage.clear();
+          }
+        },
+        
+        //結束編輯
+        finshedit: function (item) {
+         
+          if(!this.tmpTitle){
+            //編輯不能與過去一樣
+            return;
+          }
+
+          var ind = this.todoList.findIndex((item) => item.id === this.tmpId);
+          console.log(this.todoList[ind]);
+
+          this.todoList[ind].title = this.tmpTitle;
+          this.todoList[ind].time = this.getTime();
+          
+          this.tmpTitle = "";
+          this.tmpId = "";
+        },
+        //取消編輯
+        canceledit: function () {
+          this.tmpTitle = "";
+          this.tmpId = "";
+        },
+
+        //時間
+        getTime: function(){
+          var time = new Date();
+          var WeekDay = time.getDay();
+          var Min = time.getSeconds();
+          var Sec = time.getSeconds();
+          switch(WeekDay){
+            case 0:
+              WeekDay = 'Sun';
+              break;
+            case 1:
+              WeekDay = 'Mon';
+              break;
+            case 2:
+              WeekDay = 'Tue';
+              break;
+            case 3:
+              WeekDay = 'Wed';
+              break;
+            case 4:
+              WeekDay = 'Thu';
+              break;
+            case 5:
+              WeekDay = 'Fri';
+              break;
+            case 6:
+              WeekDay = 'Sat';
+              break;
+            default:
+              break;
+
+          }
+          if(Sec < 10){
+            Sec = '0'+ Sec;
+          }
+          if(Min < 10){
+            Min = '0'+ Min;
+          }
+          var createTime = WeekDay + ' ' + time.getFullYear() + '/' + (time.getMonth()+1) + '/' + time.getDate() + ' ' + time.getHours() + ':' + Min + ':' + Sec;
+          return createTime;
+        }
+      },
+      computed: {
+        //選擇全部、未完成、已完成
+        filterData() {
+          switch (this.status) {
+            case "unfinished":
+              return this.todoList.filter((item) => !item.itm_status);
+              break;
+
+            case "finished":
+              return this.todoList.filter((item) => item.itm_status);
+              break;
+            default:
+              return this.todoList;
+              break;
+          }
+        },
+      },
+      watch:{
+        todoList:{
+          handler(){
+            localStorage.setItem('todoList', JSON.stringify(this.todoList));
+          },
+          deep: true
+        },
+          
+      },
+      mounted(){
+        this.todoList = JSON.parse(localStorage.getItem('todoList'));
+      }
+    }).mount("#app");
+  </script>
+</body>
+
+</html>
