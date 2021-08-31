@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待辦事項</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <style>
+      .completed {
+        text-decoration: line-through
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <div class="container my-3">
+        <div class="input-group mb-3">
+          <span class="input-group-text">待辦事項</span>
+          <input type="text" class="form-control" placeholder="準備要做的任務"
+            id="newTodo" v-model="newTodo">
+          <button class="btn btn-primary" type="button" id="addTodo" @click="addlist">新增</button>
+        </div>
+        <div class="card text-center">
+          <ul class="list-group list-group-flush text-left" id="todoList">
+            <li  class="list-group-item" v-for="item in filterData" :key="item.id">
+              <div class="d-flex">
+                <div class="form-check">
+                    <!-- if 要編輯 -->
+                    <input v-if="tmpId === item.id" v-model="tmpTitle" type="text" class="form-control"
+                        @keyup.enter="finshedit(item)" @keyup.esc="canceledit" />
+                    <!-- 正常顯示 -->
+                    <div v-else>
+                        <input :id="item.id" type="checkbox" class="form-check-input"
+                        @click="item.itm_status = !item.itm_status" :checked="item.itm_status" />
+                        
+                        <label @click="editItem(item.id, item.title)" :for="item.id"
+                        :class="item.itm_status ? 'completed' : ''" class="form-check-label">{{ item.title }}</label>
+                    </div>
+                </div>
+                <button type="button" class="btn-close ms-auto remove" @click.prevent="remove_item(id)">
+                </button>
+              </div>
+            </li>
+            
+          </ul>
+          <div class="card-footer d-flex justify-content-between">
+            <span>有 <span id="taskCount">{{ todoList.length }}</span> 筆任務</span>
+            <div>
+              <a href="#" class="me-3" :class="status =='all' ? 'active' : ''" @click.prevent="status = 'all'">全部</a>
+              <a href="#" class="me-3" :class="status == 'unfinished' ? 'active' : ''" @click.prevent="status = 'unfinished'">未完成</a>
+              <a href="#" class="me-3" :class="status == 'finished' ? 'active' : ''" @click.prevent="status = 'finished'">已完成</a>
+              <a href="#" @click.prevent="removelist">清除所有任務</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8"
+      crossorigin="anonymous"></script>
+    <script type="module">
+        import { createApp, ref, reactive, computed} from 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.0-beta.7/vue.esm-browser.min.js';
+        
+        createApp({
+            setup() {
+                const newTodo = ref('');
+                const todoList = reactive([]);
+                const status = ref('all');
+                
+
+                
+                const addlist = () => {
+                    const content = newTodo.value && newTodo.value.trim();
+                   
+                    if(!content){
+                      //空白不給輸入
+                      return;
+                    }
+                    todoList.push({
+                      id: todoList.length + 1,
+                      title: newTodo.value,
+                      itm_status: false
+                      
+                    });
+                    localStorage.setItem('todoList', JSON.stringify(todoList.value));
+                    newTodo.value = "";
+                };
+
+                const removelist = () => {
+                    if (window.confirm("刪除所有代辦事項?")) {
+                        while (todoList.length > 0) {
+                          todoList.pop();
+                        }
+                        localStorage.clear();
+                      }
+                };
+
+                const remove_item = (id) => {
+                    var ind =todoList.findIndex((obj) => obj.id === id);
+                    todoList.splice(ind, 1);
+                    localStorage.removeItem(ind);
+                };
+
+                const tmpTitle = ref('');
+                const tmpId = ref('');
+
+                const editItem = (id, title) => {
+                    console.log('edititem');
+                    tmpId.value = id;
+                    tmpTitle.value = title;
+                };
+
+                const finshedit = (item) => {
+                    if(!tmpTitle.value){
+                        //編輯不能與過去一樣
+                        return;
+                    }
+            
+                        var ind = todoList.findIndex((item) => item.id === tmpId.value);
+                        console.log(todoList[ind]);
+            
+                        todoList[ind].title = tmpTitle.value;
+                      
+                        tmpTitle.value = "";
+                        tmpId.value = "";
+                };
+
+                const canceledit = () => {
+                    tmpTitle.value = "";
+                    tmpId.value = "";
+                };
+
+
+                const filterData = computed(() =>{
+                    switch (status.value) {
+                        case "unfinished":
+                          return todoList.filter((item) => !item.itm_status);
+                          break;
+            
+                        case "finished":
+                          return todoList.filter((item) => item.itm_status);
+                          break;
+                        default:
+                          return todoList;
+                          break;
+                      }
+                });
+
+                return {
+                    status,
+                    tmpTitle,
+                    tmpId,
+                    newTodo,
+                    todoList,
+                    addlist,
+                    remove_item,
+                    removelist,
+                    editItem,
+                    finshedit,
+                    canceledit,
+                    filterData
+                    
+                }
+            }
+        }).mount('#app');
+    </script>
+  </body>
+
+</html>
