@@ -1,5 +1,6 @@
 # 六腳學院-新手夏令營
 > 學習vue3 基本知識
+> 每日練習:[codepen](https://codepen.io/pocper1)
 
 ## Week1
 > 目的:透過資料內容呈現多筆資料列表
