@@ -15,6 +15,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
     />
+    <link rel="stylesheet" href="./style.css">
   </head>
 
   <body>
@@ -24,17 +25,16 @@
           <button
             type="button"
             class="btn btn-outline-primary"
-            @click=""
+            @click="changeres"
           >
             切換大頭貼解析度
           </button>
           現在圖片解析度：
-          <span>清晰</span>
+          <span>{{picType[picindex].title}}</span>
         </div>
 
         <div class="row">
-          <div class="box" v-for="person in users">
-            <div class="col-md-4 mb-3">
+          <div class="col-md-4 mb-3" v-for="person in users">
               <div class="card h-100">
                 <div class="position-absolute" style="top: 20px; right: 20px">
                   <button
@@ -45,7 +45,8 @@
                   </button>
                 </div>
                 <img
-                  :src="person.picture.large"
+                    
+                  :src="person.picture[picType[picindex].type]"
                   class="card-img-top"
                 />
                 <div class="card-body">
@@ -80,21 +81,13 @@
                   <p class="card-text">
                     State: {{ person.location.state }}
                   </p>
-                  <p class="card-text">
-                    Country: 
-                  </p>
+                 
                   <p class="card-text">
                     Postcode:{{ person.location.postcode }}
                   </p>
-                  <p>
-                    Address：<a
-                      href="https://www.google.com.tw/maps/search/Châtillon (Ju)Graubünden"
-                      target="_blank"
-                      >Châtillon (Ju) Graubünden Switzerland 6560</a
-                    >
-                  </p>
+                
                   <p class="card-text">
-                    description: {{ person.location.timezone.descripton }}
+                    description: {{ person.location.timezone.description }}
                   </p>
                   <p class="card-text">
                     <small class="text-muted"
@@ -103,7 +96,7 @@
                   </p>
                   <p class="card-text">
                     <small class="text-muted">
-                      registered：{{ person.registered }}
+                      registered：{{ person.registered.date }}
                     </small>
                   </p>
                  
@@ -113,7 +106,7 @@
           </div>
         </div>
       </div>
-      {{ users }}
+    
     </div>
 
     <script
@@ -127,29 +120,32 @@
     <script>
        Vue.createApp({
         data(){
-          return{
-            users:[]
-          };
+          return {
+            users: [],
+            picType:[
+              {type: 'large', title:'清晰'},
+              {type: 'medium', title:'中等'},
+              {type: 'thumbnail', title:'模糊'}
+            ],
+            picindex:0,
+          };  
         },
         methods: {
-           loaddata() {
-            axios.get('https://randomuser.me/api/?results=12') 
-            .then(function (response){ 
-              
+          getData() {
+            axios.get("https://randomuser.me/api/?results=12").then((response) => {
+              //console.log(response);
               this.users = response.data.results;
-              console.log(response.data.results);
-            }) 
-            .catch(function (error) { 
-              console.log(error); 
+              //console.log(this.users);
             });
-            console.log('2');
+           
           },
+           changeres(){
+              this.picindex = ++this.picindex%3;
+            },
         },
         
         mounted (){
-          
-          this.loaddata();
-          console.log(this.users);
+          this.getData();
         }
         
       }).mount('#app');
