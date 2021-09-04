@@ -15,7 +15,7 @@
 - 完成: 在 mounted 生命週期中，透過 Ajax 取得 https://randomuser.me/ 遠端資料，重新渲染至畫面上、包含 Ajax 並自創版型完成此挑戰
 
 ## Week2
-> githubpage: https://pocper1.github.io/Vue3_week_practice/week2/calculator.html
+> github page: https://pocper1.github.io/Vue3_week_practice/week2/calculator.html
 > 目的:製作簡易雙數的計算機
 
 - 包含兩個數值的運算
@@ -25,6 +25,7 @@
 - 完成: 將歷史資料儲存於 LocalStorage，並維持最多 10 筆歷史資料
 
 ## Week3
+> github page:https://pocper1.github.io/Vue3_week_practice/week3/ToDOList.html
 > 目的: 製作 Todos 工具，包含 CRUD 的完整行為
 
 - 可以新增、編輯、刪除、陳列 Todo 的列表功能
