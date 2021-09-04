@@ -15,6 +15,7 @@
 - 完成: 在 mounted 生命週期中，透過 Ajax 取得 https://randomuser.me/ 遠端資料，重新渲染至畫面上、包含 Ajax 並自創版型完成此挑戰
 
 ## Week2
+> githubpage: https://pocper1.github.io/Vue3_week_practice/week2/calculator.html
 > 目的:製作簡易雙數的計算機
 
 - 包含兩個數值的運算
