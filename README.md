@@ -5,6 +5,7 @@
 
 ## Week1
 > github page: https://pocper1.github.io/Vue3_week_practice/week1/templete.html
+> 
 > 目的:透過資料內容呈現多筆資料列表
 
 - 資料來源：https://randomuser.me/
