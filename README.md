@@ -16,6 +16,7 @@
 
 ## Week2
 > github page: https://pocper1.github.io/Vue3_week_practice/week2/calculator.html
+> 
 > 目的:製作簡易雙數的計算機
 
 - 包含兩個數值的運算
@@ -26,6 +27,7 @@
 
 ## Week3
 > github page:https://pocper1.github.io/Vue3_week_practice/week3/ToDOList.html
+> 
 > 目的: 製作 Todos 工具，包含 CRUD 的完整行為
 
 - 可以新增、編輯、刪除、陳列 Todo 的列表功能
